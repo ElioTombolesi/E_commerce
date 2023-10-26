@@ -14,16 +14,16 @@ public class AppUser implements UserDetails {
         @Id
         @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
-        private  Integer id;
+        private  Long id;
         private String name;
         private String username;
         private String email;
 
-        public  long getId() {
+        public  Long getId() {
                 return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(Long id) {
                 this.id = id;
         }
 
