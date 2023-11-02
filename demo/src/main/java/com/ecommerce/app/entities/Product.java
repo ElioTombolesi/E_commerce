@@ -1,4 +1,4 @@
-package com.grupoSuperman.app.persistence.entities;
+package com.ecommerce.app.entities;
 
 
 import jakarta.persistence.*;
