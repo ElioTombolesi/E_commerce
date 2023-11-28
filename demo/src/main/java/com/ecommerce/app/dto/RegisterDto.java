@@ -1,8 +1,7 @@
 package com.ecommerce.app.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ecommerce.app.entities.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
@@ -10,14 +9,12 @@ public class RegisterDto {
     private String name;
     private String email;
     private String password;
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @JsonCreator
-    public RegisterDto(@JsonProperty("name") String name, @JsonProperty("email") String email, @JsonProperty("password") String password, @JsonProperty("role") UserRole role) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+
+    public RegisterDto() {
+        this.role = UserRole.USER;
     }
 
     public String getName() {

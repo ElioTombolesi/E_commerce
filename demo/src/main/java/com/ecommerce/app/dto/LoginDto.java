@@ -1,18 +1,12 @@
 package com.ecommerce.app.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class LoginDto {
 
   private String username;
 
   private String password;
 
-  @JsonCreator
-  public LoginDto(@JsonProperty("username") String username, @JsonProperty("password") String password) {
-    this.username = username;
-    this.password = password;
+  public LoginDto() {
   }
 
   public String getUsername() {

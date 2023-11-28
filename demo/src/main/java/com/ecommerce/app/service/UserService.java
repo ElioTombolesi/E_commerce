@@ -32,6 +32,9 @@ public class UserService implements UserDetailsService {
             return userDetails;
         }
 
+        public UserEntity loadUserByEmail(String email) {
+            return userRepository.findByEmail(email);
+        }
 
         public Boolean existsByEmail(String email){
             return userRepository.existsByEmail(email);
@@ -40,14 +43,6 @@ public class UserService implements UserDetailsService {
 
        public Optional<UserEntity> loadUserById(Long id) {
            return userRepository.findById(id);
-
-//
-//           if (user != null) {
-//               return user;
-//           } else {
-//               // Puedes lanzar una excepción o devolver un UserDetails por defecto o hacer lo que consideres apropiado en caso de que el usuario no sea encontrado.
-//               throw new UsernameNotFoundException("No se encontró un usuario con el ID proporcionado: " + id);
-//           }
        }
 
         public UserDetails create(UserEntity user){

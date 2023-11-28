@@ -1,5 +1,6 @@
 package com.ecommerce.app.controller;
 
+import com.ecommerce.app.dto.TokenDto;
 import com.ecommerce.app.entities.UserEntity;
 import com.ecommerce.app.dto.LoginDto;
 import com.ecommerce.app.dto.RegisterDto;
@@ -7,6 +8,7 @@ import com.ecommerce.app.security.JwtUtilService;
 import com.ecommerce.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +32,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
 
+
     @PostMapping("/register")
     public ResponseEntity register (@RequestBody RegisterDto registerDto)
     {
@@ -42,15 +45,16 @@ public class AuthController {
             user.setName(registerDto.getName());
             user.setRole(registerDto.getRole());
             user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-            var userSaved = userService.create(user);
-            String token = jwtUtilService.generateToken(userSaved);
+            userService.create(user);
+            //String token = jwtUtilService.generateToken(userSaved);
             return new ResponseEntity(HttpStatus.OK);
         }
     }
 
     @PostMapping("/authenticate")
-    public String geyToken(@RequestBody LoginDto loginDto)
+    public ResponseEntity<TokenDto> geyToken(@RequestBody LoginDto loginDto)
     {
+        try {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getUsername(),
@@ -58,12 +62,12 @@ public class AuthController {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         UserDetails user = userService.loadUserByUsername(authentication.getName());
-
         String token = jwtUtilService.generateToken(user);
-
-        return token;
+        return ResponseEntity.ok(new TokenDto(token));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
 }
