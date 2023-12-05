@@ -1,18 +1,23 @@
 package com.ecommerce.app.controller;
 
+import com.ecommerce.app.dto.CrudDto;
 import com.ecommerce.app.entities.UserEntity;
 import com.ecommerce.app.entities.enums.UserRole;
 import com.ecommerce.app.security.JwtUtilService;
 import com.ecommerce.app.service.UserService;
+import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,17 +55,14 @@ public class UserController {
     }
 
    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        ResponseEntity<String> response = null;
+    public ResponseEntity<CrudDto> delete(@PathVariable Long id) {
 
         if (userService.loadUserById(id) != null) {
             userService.delete(id);
-            response = ResponseEntity.status(HttpStatus.NO_CONTENT).body("Eliminado");
+            return ResponseEntity.ok(new CrudDto("Eliminado"));
         } else {
-            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-        return response;
     }
 
    @PutMapping()
@@ -71,7 +73,7 @@ public class UserController {
        if (userDetails != null) {
            response = ResponseEntity.ok(userService.update(user));
        } else {
-           response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+           response = ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
        }
 
        return response;
@@ -86,7 +88,7 @@ public class UserController {
             var userLogged = userService.loadUserByEmail(username);
             if (userLogged.getRole() == UserRole.ROOT){
                 if(userService.existsByEmail(userEntity.getEmail()))
-                { return  new ResponseEntity<>("Ya existe un usuario registrado con ese correo!", HttpStatus.SEE_OTHER); }
+                { return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ya existe un usuario registrado con ese correo!"); }
                 else
                 {
                     UserEntity user = new UserEntity();
@@ -100,5 +102,19 @@ public class UserController {
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No tiene permisos para crear un usuario");
+    }
+
+    @GetMapping("/pdf")
+    public void generatePdf(HttpServletResponse response) throws DocumentException, IOException {
+
+        response.setContentType("application/pdf");
+        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD:HH:MM:SS");
+        String currentDateTime = dateFormat.format(new Date());
+        String headerkey = "Content-Disposition";
+        String headervalue = "attachment; filename=ListadoUsuarios_" + currentDateTime + ".pdf";
+        response.setHeader(headerkey, headervalue);
+
+        userService.generate(response);
+
     }
 }

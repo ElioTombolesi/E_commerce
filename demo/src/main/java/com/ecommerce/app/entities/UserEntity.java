@@ -4,6 +4,7 @@ import com.ecommerce.app.entities.enums.UserRole;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "Users")
 public class UserEntity {
         @Id
         @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
@@ -16,6 +17,13 @@ public class UserEntity {
         private UserRole role;
 
         public UserEntity() {
+        }
+
+        public UserEntity(String name, String email, String password, UserRole role) {
+                this.name = name;
+                this.email = email;
+                this.password = password;
+                this.role = role;
         }
 
         public Long getId() {

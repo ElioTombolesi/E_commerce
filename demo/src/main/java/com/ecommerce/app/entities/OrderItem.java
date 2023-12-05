@@ -2,14 +2,14 @@ package com.ecommerce.app.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "order_item")
+@Table(name = "OrderItems")
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_item_seq")
     @SequenceGenerator(name = "order_item_seq", sequenceName = "order_item_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
-    private Long amount;
+    private Double amount;
     private Long quantity;
     @OneToOne
     private Product product;
@@ -22,11 +22,11 @@ public class OrderItem {
         this.id = id;
     }
 
-    public Long getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

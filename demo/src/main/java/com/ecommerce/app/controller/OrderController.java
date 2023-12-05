@@ -1,6 +1,11 @@
 package com.ecommerce.app.controller;
+import com.ecommerce.app.dto.CrudDto;
+import com.ecommerce.app.dto.ResponseMessageDto;
 import com.ecommerce.app.entities.Order;
 import com.ecommerce.app.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,42 +26,70 @@ public class OrderController {
         return orderService.getAll();
     }
 
+    @GetMapping("/mis-pedidos")
+    public ResponseEntity getAllByUser(HttpServletRequest request){
+        try {
+            return ResponseEntity.ok(orderService.getAllByUserId(request));
+        }catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDto(exception.getMessage()));
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Order>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.loadOrderById(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        ResponseEntity<String> response = null;
-
+    public ResponseEntity<CrudDto> delete(@PathVariable Long id) {
         if (orderService.loadOrderById(id) != null) {
             orderService.delete(id);
-            response = ResponseEntity.status(HttpStatus.NO_CONTENT).body("Eliminado");
+            return ResponseEntity.ok(new CrudDto("Eliminado"));
         } else {
-            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-        return response;
     }
 
     @PutMapping()
     public ResponseEntity<Order> update(@RequestBody Order order) {
-        ResponseEntity<Order> response = null;
-
         Optional<Order> userDetails = orderService.loadOrderById(order.getId());
         if (userDetails != null) {
-            response = ResponseEntity.ok(orderService.update(order));
+            return ResponseEntity.ok(orderService.update(order));
         } else {
-            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        return response;
     }
 
     @PostMapping("/create")
-    public ResponseEntity create(@RequestBody Order order) throws Exception {
-            var productSaved = orderService.create(order);
-            return new ResponseEntity(HttpStatus.OK);
+    @Operation(summary = "Crear una orden", description = "Ejemplo de request: \n {\n" +
+            "  \"id\": 0,\n" +
+            "  \"firstName\": \"\",\n" +
+            "  \"lastName\": \"\",\n" +
+            "  \"city\": \"\",\n" +
+            "  \"address\": \"\",\n" +
+            "  \"email\": \"\",\n" +
+            "  \"orderItems\": [\n" +
+            "    {\n" +
+            "      \"id\": 0,\n" +
+            "      \"quantity\": 1,\n" +
+            "      \"product\": {\n" +
+            "        \"id\": [productId]\n" +
+            "      }\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}")
+    public ResponseEntity create(HttpServletRequest request, @RequestBody Order order)
+    {
+        try {
+            var productSaved = orderService.create(order, request);
+            if (productSaved != null){
+                return ResponseEntity.ok(productSaved);
+            }else{
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        }catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDto(exception.getMessage()));
+        }
     }
 }

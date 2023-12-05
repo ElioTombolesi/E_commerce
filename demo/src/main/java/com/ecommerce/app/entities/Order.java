@@ -2,28 +2,33 @@ package com.ecommerce.app.entities;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
 @Entity
+@Table(name = "Orders")
 public class Order {
     @Id
     @SequenceGenerator(name = "orders_seq", sequenceName = "orders_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orders_seq")
     private Long id;
     private Double totalPrice;
-    private LocalDate date;
+    private Date date;
     private String firstName;
     private String lastName;
     private String city;
     private String address;
     private String email;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private UserEntity userEntity;
+
     public Order() {
-        this.date = LocalDate.now();
+        this.date = new Date();
         this.orderItems = new ArrayList<>();
     }
 
@@ -39,15 +44,15 @@ public class Order {
         return totalPrice;
     }
 
-//    public void setTotalPrice(Double totalPrice) {
-//        this.totalPrice = totalPrice;
-//    }
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 
-    public LocalDate getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -97,5 +102,13 @@ public class Order {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public UserEntity getUserEntity() {
+        return userEntity;
+    }
+
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 }

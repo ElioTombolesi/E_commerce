@@ -1,5 +1,6 @@
 
 package com.ecommerce.app.controller;
+import com.ecommerce.app.dto.CrudDto;
 import com.ecommerce.app.entities.Product;
 import com.ecommerce.app.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,37 +30,33 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        ResponseEntity<String> response = null;
-
+    public ResponseEntity<CrudDto> delete(@PathVariable Long id) {
         if (productService.loadProductById(id) != null) {
             productService.delete(id);
-            response = ResponseEntity.status(HttpStatus.NO_CONTENT).body("Eliminado");
+            return ResponseEntity.ok(new CrudDto("Eliminado"));
         } else {
-            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-        return response;
     }
 
     @PutMapping()
     public ResponseEntity<Product> update(@RequestBody Product product) {
-        ResponseEntity<Product> response = null;
-
         Optional<Product> userDetails = productService.loadProductById(product.getId());
         if (userDetails != null) {
-            response = ResponseEntity.ok(productService.update(product));
+            return ResponseEntity.ok(productService.update(product));
         } else {
-            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-        return response;
     }
 
     @PostMapping("/create")
     public ResponseEntity create(@RequestBody Product product)
     {
-        var ProductSaved = productService.create(product);
-        return new ResponseEntity(HttpStatus.OK);
+        var productSaved = productService.create(product);
+        if (productSaved != null){
+            return ResponseEntity.ok(productSaved);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }

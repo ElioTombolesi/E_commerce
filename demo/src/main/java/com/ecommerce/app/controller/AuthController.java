@@ -34,10 +34,10 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity register (@RequestBody RegisterDto registerDto)
+    public ResponseEntity<UserDetails> register (@RequestBody RegisterDto registerDto)
     {
         if(userService.existsByEmail(registerDto.getEmail()))
-        { return  new ResponseEntity<>("Ya existe un usuario registrado con ese correo!", HttpStatus.SEE_OTHER); }
+        { return new ResponseEntity("Ya existe un usuario registrado con ese correo!", HttpStatus.SEE_OTHER); }
         else
         {
             UserEntity user = new UserEntity();
@@ -45,9 +45,8 @@ public class AuthController {
             user.setName(registerDto.getName());
             user.setRole(registerDto.getRole());
             user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-            userService.create(user);
-            //String token = jwtUtilService.generateToken(userSaved);
-            return new ResponseEntity(HttpStatus.OK);
+            var userCreated = userService.create(user);
+            return ResponseEntity.ok(userCreated);
         }
     }
 

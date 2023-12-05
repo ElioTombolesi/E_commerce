@@ -4,6 +4,7 @@ package com.ecommerce.app.entities;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "Products")
 public class Product {
 
     @Id

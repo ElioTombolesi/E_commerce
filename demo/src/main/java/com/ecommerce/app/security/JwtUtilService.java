@@ -50,50 +50,20 @@ public class JwtUtilService {
             .compact();
   }
 
-//  public String generateToken(userE userDetails) {
-//    Map<String, Object> claims = new HashMap<>();
-//    // Agregando informacion adicional como "claim"
-//    var rol = userDetails.getAuthorities().stream().collect(Collectors.toList()).get(0);
-//    claims.put("rol", rol);
-//    return createToken(claims, userDetails.getUsername());
+//  public boolean validateToken(String token, UserDetails userDetails) {
+//    final String email = extractUsername(token);
+//    return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
 //  }
-//
-//  private String createToken(Map<String, Object> claims, String subject) {
-//
-//    return Jwts
-//        .builder()
-//        .setClaims(claims)
-//        .setSubject(subject)
-//        .setIssuedAt(new Date(System.currentTimeMillis()))
-//        .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-//        .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KEY)
-//        .compact();
-//  }
-
-  public boolean validateToken(String token, UserDetails userDetails) {
-    final String email = extractUsername(token);
-    return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
-  }
 
   public boolean validateToken(String token) {
     try {
       Jwts.parser().setSigningKey(JWT_SECRET_KEY).parseClaimsJws(token);
       return true;
     } catch (SignatureException e) {
-//      log.info("Invalid JWT signature.");
-//      log.trace("Invalid JWT signature trace: {}", e);
     } catch (MalformedJwtException e) {
-//      log.info("Invalid JWT token.");
-//      log.trace("Invalid JWT token trace: {}", e);
     } catch (ExpiredJwtException e) {
-//      log.info("Expired JWT token.");
-//      log.trace("Expired JWT token trace: {}", e);
     } catch (UnsupportedJwtException e) {
-//      log.info("Unsupported JWT token.");
-//      log.trace("Unsupported JWT token trace: {}", e);
     } catch (IllegalArgumentException e) {
-//      log.info("JWT token compact of handler are invalid.");
-//      log.trace("JWT token compact of handler are invalid trace: {}", e);
     }
     return false;
   }
